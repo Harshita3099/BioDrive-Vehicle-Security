@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BioDrive — Vehicle Security Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">B</div>
+    <div>
+      <div class="brand-text">BIO<span>DRIVE</span></div>
+      <div class="brand-sub">VEHICLE SECURITY CONSOLE</div>
+    </div>
+  </div>
+  <nav class="topnav">
+    <a href="/" class="active">Console</a>
+    <a href="/register">Register Driver</a>
+    <a href="/dashboard">Security Logs</a>
+  </nav>
+  <div class="topbar-right">
+    <span class="live-dot"></span>
+    <span id="clock">--:--:--</span>
+  </div>
+</header>
+
+<div class="shell">
+
+  <!-- LEFT: vehicle + system status -->
+  <div class="left-col">
+    <div class="vehicle-badge locked" id="vehicleBadge">
+      <div class="icon">🚗</div>
+      <div class="state" id="vehicleState">LOCKED</div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">System Status</div>
+      <div class="check-list">
+        <div class="check-item"><span class="label"><span class="check-dot on"></span>System Online</span></div>
+        <div class="check-item"><span class="label"><span class="check-dot" id="dbDot"></span>Database Connected</span></div>
+        <div class="check-item"><span class="label"><span class="check-dot off" id="camDot"></span>Camera Ready</span></div>
+        <div class="check-item"><span class="label"><span class="check-dot warn"></span>Demo Sensor Mode</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Quick Stats</div>
+      <div class="mini-stat-row">
+        <div class="mini-stat"><span class="n" id="qsDrivers">–</span><span class="l">Drivers</span></div>
+        <div class="mini-stat"><span class="n" id="qsToday">–</span><span class="l">Today</span></div>
+        <div class="mini-stat"><span class="n" id="qsFailed">–</span><span class="l">Failed Today</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER: authentication flow -->
+  <div class="panel">
+    <div class="panel-title">Authentication Flow</div>
+
+    <div id="lockoutBanner" class="lockout-banner hidden"></div>
+
+    <div class="flow-steps">
+
+      <!-- Step 1: Fingerprint -->
+      <div class="flow-step active" id="stepFingerprint">
+        <div class="flow-step-head">
+          <div class="flow-num">1</div>
+          <div class="flow-title">Fingerprint <span class="sensor-tag">DEMO SENSOR</span></div>
+          <span class="flow-status-pill waiting" id="fpPill">Waiting</span>
+        </div>
+        <div class="flow-body">
+          <div class="flow-desc">Select a registered fingerprint template to simulate a sensor scan.</div>
+          <select id="fingerprintSelect"><option value="">Loading registered users…</option></select>
+          <button class="btn" id="scanFpBtn">Scan Fingerprint</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Face Recognition -->
+      <div class="flow-step pending" id="stepFace">
+        <div class="flow-step-head">
+          <div class="flow-num">2</div>
+          <div class="flow-title">Face Recognition</div>
+          <span class="flow-status-pill waiting" id="facePill">Waiting</span>
+        </div>
+        <div class="flow-body">
+          <div class="flow-desc">Camera unlocks after fingerprint verification.</div>
+          <div class="camera-wrap hidden" id="cameraWrap">
+            <video id="video" autoplay playsinline></video>
+            <div class="scan-ring" id="scanRing"></div>
+          </div>
+          <div class="face-detail hidden" id="faceDetail"></div>
+          <button class="btn" id="startCameraBtn" disabled>Start Camera</button>
+          <button class="btn hidden" id="verifyFaceBtn">Verify Face</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Authentication Result -->
+      <div class="flow-step pending" id="stepResult">
+        <div class="flow-step-head">
+          <div class="flow-num">3</div>
+          <div class="flow-title">Authentication Result</div>
+          <span class="flow-status-pill waiting" id="resultPill">Waiting</span>
+        </div>
+        <div class="flow-body">
+          <div class="result-headline" id="resultHeadline">Awaiting both factors…</div>
+          <div class="result-reason" id="resultReason">No attempt completed yet this session.</div>
+          <div class="result-checklist hidden" id="resultChecklist"></div>
+        </div>
+      </div>
+
+      <!-- Step 4: Vehicle Unlock -->
+      <div class="flow-step pending" id="stepUnlock">
+        <div class="flow-step-head">
+          <div class="flow-num">4</div>
+          <div class="flow-title">Vehicle Unlock</div>
+          <span class="flow-status-pill waiting" id="unlockPill">Waiting</span>
+        </div>
+        <div class="flow-body">
+          <div class="flow-desc">Available once authentication succeeds.</div>
+          <button class="btn btn-start" id="startBtn" disabled>Unlock &amp; Start Vehicle</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="msgBox"></div>
+  </div>
+
+  <!-- RIGHT: driver + security info -->
+  <div class="right-col">
+    <div class="panel">
+      <div class="panel-title">Current Session</div>
+      <div class="info-row"><span class="k">Driver</span><span class="v" id="sessDriver">—</span></div>
+      <div class="info-row"><span class="k">Fingerprint</span><span class="v" id="sessFp">—</span></div>
+      <div class="info-row"><span class="k">Face Match</span><span class="v" id="sessFace">—</span></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Last Unlock</div>
+      <div class="info-row"><span class="k">Driver</span><span class="v" id="lastDriver">—</span></div>
+      <div class="info-row"><span class="k">Time</span><span class="v" id="lastTime">—</span></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Recent Security Events</div>
+      <div class="event-feed" id="eventFeed">
+        <div style="color: var(--text-faint); font-family: var(--font-mono); font-size: 11px;">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="bottombar">
+  <span class="status-chip"><span class="dot on"></span>System Online</span>
+  <span class="status-chip"><span class="dot" id="footerDbDot"></span><span id="footerDbLabel">Database Connecting…</span></span>
+  <span class="status-chip"><span class="dot off" id="footerCamDot"></span><span id="footerCamLabel">Camera Idle</span></span>
+  <span class="status-chip"><span class="dot warn"></span>Demo Sensor Mode</span>
+</footer>
+
+<canvas id="captureCanvas" class="hidden"></canvas>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

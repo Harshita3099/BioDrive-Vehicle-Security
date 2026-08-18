@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Logs — BioDrive</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">B</div>
+    <div>
+      <div class="brand-text">BIO<span>DRIVE</span></div>
+      <div class="brand-sub">VEHICLE SECURITY CONSOLE</div>
+    </div>
+  </div>
+  <nav class="topnav">
+    <a href="/">Console</a>
+    <a href="/register">Register Driver</a>
+    <a href="/dashboard" class="active">Security Logs</a>
+  </nav>
+  <div class="topbar-right">
+    <span class="live-dot"></span>
+    <span id="clock">--:--:--</span>
+  </div>
+</header>
+
+<div class="shell wide">
+
+  <div class="panel" style="margin-bottom: 16px;">
+    <div class="panel-title">
+      System Status
+      <span class="system-status-badge NORMAL" id="statusBadge">NORMAL</span>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-num" id="statDrivers">0</div><div class="stat-label">Registered Drivers</div></div>
+      <div class="stat-box"><div class="stat-num" id="statToday">0</div><div class="stat-label">Today's Attempts</div></div>
+      <div class="stat-box"><div class="stat-num" style="color: var(--green);" id="statSuccess">0</div><div class="stat-label">Successful Today</div></div>
+      <div class="stat-box"><div class="stat-num" style="color: var(--red);" id="statFailedToday">0</div><div class="stat-label">Failed Today</div></div>
+      <div class="stat-box"><div class="stat-num" style="color: var(--red);" id="statFailedAll">0</div><div class="stat-label">Failed (All Time)</div></div>
+    </div>
+
+    <div id="lockoutNotice" class="lockout-banner hidden"></div>
+  </div>
+
+  <div class="shell two-col" style="padding: 0; margin: 0; max-width: none;">
+    <div class="panel">
+      <div class="panel-title">Vehicle Security Log</div>
+      <table class="log-table">
+        <thead>
+          <tr><th>User</th><th>Stage</th><th>Result</th><th>Reason / Score</th><th>Time</th></tr>
+        </thead>
+        <tbody id="logRows">
+          <tr><td colspan="5" style="color: var(--text-faint);">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Recent Security Events</div>
+      <div class="event-feed" id="eventFeed">
+        <div style="color: var(--text-faint); font-family: var(--font-mono); font-size: 11px;">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="bottombar">
+  <span class="status-chip"><span class="dot on"></span>System Online</span>
+  <span class="status-chip"><span class="dot on" id="footerDbDot"></span><span id="footerDbLabel">Database Connected</span></span>
+  <span class="status-chip"><span class="dot off"></span>Camera Idle</span>
+  <span class="status-chip"><span class="dot warn"></span>Demo Sensor Mode</span>
+</footer>
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

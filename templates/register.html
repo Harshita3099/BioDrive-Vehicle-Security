@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register Driver — BioDrive</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">B</div>
+    <div>
+      <div class="brand-text">BIO<span>DRIVE</span></div>
+      <div class="brand-sub">VEHICLE SECURITY CONSOLE</div>
+    </div>
+  </div>
+  <nav class="topnav">
+    <a href="/">Console</a>
+    <a href="/register" class="active">Register Driver</a>
+    <a href="/dashboard">Security Logs</a>
+  </nav>
+  <div class="topbar-right">
+    <span class="live-dot"></span>
+    <span id="clock">--:--:--</span>
+  </div>
+</header>
+
+<div class="shell two-col">
+
+  <div class="panel">
+    <div class="panel-title">Driver Onboarding</div>
+
+    <div class="lifecycle-track">
+      <span id="lc1">○ Name</span><span class="lc-sep">→</span>
+      <span id="lc2">○ Fingerprint Template</span><span class="lc-sep">→</span>
+      <span id="lc3">○ Capture Face Samples</span><span class="lc-sep">→</span>
+      <span id="lc4">○ Train Model</span><span class="lc-sep">→</span>
+      <span id="lc5">○ Save Driver</span>
+    </div>
+
+    <label>Driver Name</label>
+    <input type="text" id="nameInput" placeholder="e.g. Harshita">
+
+    <label>Simulated Fingerprint ID</label>
+    <input type="text" id="fingerprintInput" placeholder="e.g. FP-001 (must be unique)">
+    <div class="hint">In a real system this would be a captured minutiae template. Here, it's a unique ID that stands in for one.</div>
+
+    <label>Face Enrollment</label>
+    <div class="tab-row">
+      <button class="tab-btn active" id="tabWebcam">Use Webcam</button>
+      <button class="tab-btn" id="tabUpload">Upload Photos</button>
+    </div>
+
+    <div id="webcamPane">
+      <div class="camera-wrap">
+        <video id="regVideo" autoplay playsinline></video>
+      </div>
+      <button class="btn" id="startRegCameraBtn">Start Camera</button>
+      <button class="btn hidden" id="captureBtn">Capture Sample (<span id="captureCount">0</span>/3)</button>
+      <div class="hint">Capture 3 shots from slightly different angles for a more reliable match.</div>
+    </div>
+
+    <div id="uploadPane" class="hidden">
+      <input type="file" id="fileInput" accept="image/*" multiple>
+      <div class="hint">Upload 1–3 clear, front-facing photos.</div>
+    </div>
+
+    <button class="btn btn-start" id="registerBtn">Register Driver</button>
+
+    <div id="regMsg"></div>
+
+    <div class="confirm-card hidden" id="confirmCard">
+      <div class="headline">✓ Driver Registered Successfully</div>
+      <div class="info-row"><span class="k">Driver Name</span><span class="v" id="confName">—</span></div>
+      <div class="info-row"><span class="k">Fingerprint ID</span><span class="v" id="confFp">—</span></div>
+      <div class="info-row"><span class="k">Face Samples</span><span class="v" id="confSamples">—</span></div>
+      <div class="info-row"><span class="k">Registered At</span><span class="v" id="confTime">—</span></div>
+      <div class="sample-thumbs" id="sampleThumbs"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Capture Preview</div>
+    <div class="sample-thumbs" id="livePreview"></div>
+    <div class="hint" style="margin-top: 12px;">Samples appear here as you capture or upload them.</div>
+  </div>
+
+</div>
+
+<footer class="bottombar">
+  <span class="status-chip"><span class="dot on"></span>System Online</span>
+  <span class="status-chip"><span class="dot on"></span>Database Connected</span>
+  <span class="status-chip"><span class="dot off" id="footerCamDot"></span><span id="footerCamLabel">Camera Idle</span></span>
+  <span class="status-chip"><span class="dot warn"></span>Demo Sensor Mode</span>
+</footer>
+
+<canvas id="regCanvas" class="hidden"></canvas>
+
+<script src="{{ url_for('static', filename='js/register.js') }}"></script>
+</body>
+</html>
