@@ -65,3 +65,14 @@ biodrive/
 
 ```bash
 python -m venv venv
+
+## Screenshots
+
+### Console
+![Console](229.png)
+
+### Registered Driver
+![Registered Driver](230.png)
+
+### Security Logs
+![Security Logs](231.png)
