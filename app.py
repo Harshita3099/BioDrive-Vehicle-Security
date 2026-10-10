@@ -1,8 +1,8 @@
 import time
 from flask import Flask, render_template, request, jsonify
 import db
-from face import face_utils
-from fingerprint import fingerprint_utils
+import face_utils
+import fingerprint_utils
 
 app = Flask(__name__)
 
